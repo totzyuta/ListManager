@@ -7,12 +7,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Global Variables */
-int profile_data_ntimes = 0;	/*Number of elements in profile_data_store */
-#define MAX_STR_LEN 69
-
-/* Practice 4-2 */
+#define MAX_STR_LEN 69 
 #define MAX_PROFILES 10000
+
+/* Global Variables */
+int profile_data_ntimes = 0;	// Number of elements in profile_data_store 
+
 struct profile profile_data_store[MAX_PROFILES];
 
 struct date 
@@ -33,7 +33,6 @@ struct profile
  * Create a new date into D from STR like "2004-05-02".
  * return: struct date *D itself
  * */
-
 struct date *new_date(struct date *d, char *str)
 {
 	char *ptr[3];
@@ -55,7 +54,6 @@ struct date *new_date(struct date *d, char *str)
  * "0,Takahashi Kazuyuki,1977-04-27,Saitama,Fukuoka Softbank Hawks".
  * return: struct profile *P itself
  * */
-
 struct profile *new_profile(struct profile *p, char *csv)
 {
 	char *ptr[5];
@@ -85,52 +83,53 @@ struct profile *new_profile(struct profile *p, char *csv)
 	return p;
 }
 
-void cmd_quit()
+void cmd_quit()		// Exit Program 
 {
 	printf("Command: Quit\n");
 	exit(0);
 }
 
-void cmd_check()
+void cmd_check()	// Check registered contents
 {
 	printf("Command: Check\n");
 }
 
-void cmd_print(char *prm)
+void cmd_print(char *prm)	// Print "n" elements from head
 {
 	printf("Command: print\n");
 	printf("Prm = %s\n", prm);
 }
 
-void cmd_read(char *prm)
+void cmd_read(char *prm)	// Read "file"
 {
 	printf("Command: read\n");
 	printf("Prm = %s\n", prm);
 }
 
-void cmd_write(char *prm)
+void cmd_write(char *prm)	// Write to "file"
 {
 	printf("Command: write\n");
 	printf("Prm = %s\n", prm);
 }
 
-void cmd_find(char *prm)
+void cmd_find(char *prm)	// Search and Print the result
 {
 	printf("Command: find\n");
 	printf("Prm = %s\n", prm);
 }
 
-void cmd_sort(char *prm)
+void cmd_sort(char *prm)	// CSVのn番目の項目で整列(表示はしない）
 {
 	printf("Command: sort\n");
 	printf("Prm = %s\n", prm);
 }
 
+/* コマンド文字と引数で示された処理を実行 */
 int exec_command(char cmd, char *prm)
 {
 	switch (cmd) {
-		case 'Q': cmd_quit();	break;
-		case 'C': cmd_check();	break;
+		case 'Q': cmd_quit();		break;
+		case 'C': cmd_check();		break;
 		case 'P': cmd_print(prm);	break;
 		case 'R': cmd_read(prm);	break;
 		case 'W': cmd_write(prm);	break;
@@ -142,6 +141,7 @@ int exec_command(char cmd, char *prm)
 	}
 }
 
+/* 行をコンマで５つの文字列に分割 */
 int split(char *str, char *ret[], char sep, int max)
 {
 	int i = 0;
@@ -157,6 +157,7 @@ int split(char *str, char *ret[], char sep, int max)
 	return ret;
 }
 
+/* ５つの文字列を項目毎に構造体や配列に保存 */
 int new_profile(int np, char *line)
 {
 	/* use split_test function for the test of parse_line()
@@ -205,6 +206,7 @@ int subst(char *str, char c1, char c2)
  * LINE must have a room for MAX_LINE_LEN+1 chars (additional 1 is for \0).
  */
 
+/* 標準入力から１行読み込む */
 int get_line(char *line)
 {
   if (fgets(line, MAX_LINE_LEN + 1, stdin) == NULL)
@@ -215,10 +217,9 @@ int get_line(char *line)
   return 1; /* succeeded */
 }
 
+/* 読み込んだ行を処理する */
 int parse_line(char *line)
 {
-	// char *ret[5];
-	// split(line, ret, ',', 5);
 	if (line[0] == '%') {
 		exec_command(line[1], &line[3]);
 	} else {
@@ -227,8 +228,15 @@ int parse_line(char *line)
 	return 1;	// succeeded 
 }
 
+/* CSVの行を処理する */
+int parse_csv()
+{
+
+}
+
 int main()
 {
+	/* test
 	p.id = 94245566;
 	strncpy(p.name, "Yuta Totsuka", 70);
 	d.y = 2012;
@@ -238,10 +246,11 @@ int main()
 	new_pr(&p, "Information");
 	
 	printf("Name: %s\n", (*profile_data_store).name);
+	*/
 
 	char line[MAX_LINE_LEN + 1];
-
-	while (get_line(line)) {
+	while (get_line(line))
+	{
 		parse_line(line);
 	};
 	return 0;

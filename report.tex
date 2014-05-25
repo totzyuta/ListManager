@@ -1,13 +1,38 @@
+
+
 \documentclass[a4j]{jarticle}
+
+\usepackage{listings}
+
+\lstset{%
+  language={C},
+  basicstyle={\small},%
+  identifierstyle={\small},%
+  commentstyle={\small\itshape},%
+  keywordstyle={\small\bfseries},%
+  ndkeywordstyle={\small},%
+  stringstyle={\small\ttfamily},
+  frame={tb},
+  breaklines=true,
+  columns=[l]{fullflexible},%
+  numbers=left,%
+  xrightmargin=0zw,%
+  xleftmargin=3zw,%
+  numberstyle={\scriptsize},%
+  stepnumber=1,
+  numbersep=1zw,%
+  lineskip=-0.5ex%
+}
 
 \title{プログラミング演習\\中間レポート}
 \author{\\学籍番号：09425566\\氏名：戸塚佑太}
-\date{出題日：2013/05/29\\提出日：2013/05/26\\締切り日：2013/05/26\\}
+\date{出題日：2014/05/19\\提出日：2014/05/26\\締切り日：2014/05/26\\}
 
 \begin{document}
 \maketitle
 
 \newpage
+
 
 
 %
@@ -113,7 +138,7 @@ struct profile profile_data_store[MAX_PROFILES];
 %	SECTION 3
 %
 
-\section{プログラムの主な構造とその説明}
+\section{プログラムリストおよび、その説明}
 
 \begin{verbatim}
 　完成したプログラムを末尾に添付する．このセクションでは，プログラムの主な構造について説明する．
@@ -130,7 +155,7 @@ struct profile profile_data_store[MAX_PROFILES];
 \section{プログラムの使用例・テスト}
 
 本プログラムは名簿データを管理するためのプログラムである．標準入力されたCSV形式のデータまたはファイル，％から始まるコマンドに応じた処理をし，処理結果を標準出力に表示する．入力形式については概要を参照．
-本プログラム(main.c)をgccによりコンパイルし，test.csvというCSVファイルの読み込み（入力）を行ったとする．
+まず、本プログラム(main.c)をgccによりコンパイルし，a.outという実行ファイルを作成する。test.csvというCSVファイルの読み込み（入力）を行う場合は、下のように./a.out < test.csvと入力する。
 
 {\baselineskip 3mm
 \begin{verbatim}
@@ -139,7 +164,7 @@ struct profile profile_data_store[MAX_PROFILES];
 \end{verbatim}
 }
 
-test.csvは以下の通りである．
+test.csvは以下のようであった場合を想定する。
 
 {\baselineskip 3mm
 \begin{verbatim}
@@ -156,7 +181,7 @@ test.csvは以下の通りである．
 \end{verbatim}
 }
 
-このとき，以下のようにユーザがより読み取りやすいように出力を得ることができる．
+このとき以下のように、ユーザがより読み取りやすいように出力を得ることができる．
 
 {\baselineskip 3mm
 \begin{verbatim}
@@ -248,237 +273,10 @@ struct profile *newprofileのように構造体の宣言にポインタがつい
 
 \section{作成したプログラムのソースコード}
 
-{\baselineskip 3mm
-\begin{verbatim}
-     1	#include<stdio.h>
-     2	#include<stdlib.h>
-     3	#include<string.h>
-     4	#define MAX_LINE_LEN 1024/*一行の最大文字数*/
-     5	#define MAX_STR_LEN 69/*氏名・住所の最大文字数*/
-     6	#define MAX_PROFILES 10000/*蓄積させられる最大件数*/
-     7	
-     8	struct date{
-     9	  int y;
-    10	  int m;
-    11	  int d;
-    12	};
-    13	
-    14	struct profile{
-    15	  int id;
-    16	  char name[MAX_STR_LEN+1];
-    17	  struct date birth;
-    18	  char home[MAX_STR_LEN+1];
-    19	  char *comment;
-    20	};
-    21	
-    22	struct profile profile_data_store[MAX_PROFILES];/*グローバル変数*/
-    23	int profile_data_nitems = 0;/*登録%C件数を数えるためのカウンタ*/
-    24	
-    25	
-    26	int subst(char *str, char c1, char c2)
-    27	{
-    28	  int n=0;
-    29	  while(*str!='\0'){
-    30	    if(*str == c1){
-    31	      *str=c2;
-    32	      n++;
-    33	    }
-    34	      *str++;
-    35	  }
-    36	  return n;//変換した回数の値を返す
-    37	}
-    38	
-    39	/*文字列操作関数','を'\0'へ*/
-    40	int split(char *str, char *ret[], char sep, int max)
-    41	{
-    42	 int n=0;
-    43	  
-    44	  ret[n]=str;
-    45	  n = n + 1;
-    46	
-    47	  while(*str && n < max){
-    48	    if(*str == sep){
-    49	      *str = '\0'; 
-    50	      ret[n] = str + 1;
-    51	      n++;
-    52	    }
-    53	    str++;
-    54	  }
-    55	  return n;
-    56	}
-    57	/*一行を読み込みsubstへ送る*/
-    58	int get_line(char *line)
-    59	{
-    60	  if(fgets(line,1025,stdin) == NULL){
-    61	    return 0;
-    62	  }
-    63	  
-    64	  subst(line,'\n','\0');
-    65	
-    66	  return 1;
-    67	}
-    68	 /**
-    69	  * Create a new date into D from STR like "2004-05-02".
-    70	  * return: struct date *D itself
-    71	  */
-    72	/*Birthの分割，数値の代入*/
-    73	struct date *new_date(struct date *d, char *str)
-    74	 {
-    75	   char *ptr[3];
-    76	 
-    77	   if (split(str, ptr, '-', 3) != 3)
-    78	     return NULL;
-    79	
-    80	   d->y = atoi(ptr[0]);
-    81	   d->m = atoi(ptr[1]);
-    82	   d->d = atoi(ptr[2]);
-    83	 
-    84	   return d;
-    85	 }
-    86	 /**
-    87	  * Create a new profile into P from CSV string like
-    88	  *  "0,Takahashi Kazuyuki,1977-04-27,Saitama,Fukuoka Softbank Hawks".
-    89	  * return: struct profile *P itself
-    90	  */
-    91	
-    92	/*CSV形式の一文を分割，文字列，値の代入・格納*/
-    93	struct profile *new_profile(struct profile *p, char *csv)
-    94	{
-    95	  char *ptr[5];
-    96	
-    97	  if (split(csv, ptr, ',', 5) != 5)
-    98	     return NULL; 
-    99	
-   100	   /* ID: id */
-   101	   p->id = atoi(ptr[0]); 
-   102	 
-   103	   /* 学校名: name */
-   104	   strncpy(p->name, ptr[1], MAX_STR_LEN);  
-   105	   p->name[MAX_STR_LEN] = '\0';
-   106	 
-   107	   /* 設立年月日: birthday */
-   108	   if (new_date(&p->birth, ptr[2]) == NULL)
-   109	     return NULL; /* format error */
-   110	 
-   111	   /* 所在地: home */
-   112	   strncpy(p->home, ptr[3], MAX_STR_LEN);//上に同じ．  
-   113	   p->home[MAX_STR_LEN] = '\0';
-   114	 
-   115	   /*備考*/
-   116	   /*malloc：指定バイト分の，メモリ領域を確保
-   117	    strlen(ptr[4])+1分のメモリを確保して先頭アドレスを返す．
-   118	   返却された先頭アドレスを(char*)とみなしp->commentに代入*/
-   119	   p->comment = (char *)malloc(sizeof(char) * (strlen(ptr[4])+1));
-   120	   strcpy(p->comment, ptr[4]);
-   121	 
-   122	   return p;
-   123	 }
-   124	
-   125	
-   126	/*終了*/
-   127	void cmd_quit()
-   128	{
-   129	  exit(0); 
-   130	}
-   131	/*登録件数*/
-   132	void cmd_check()
-   133	{
-   134	  printf("登録件数：%d件\n",profile_data_nitems);
-   135	}
-   136	/*先頭からn件表示 n = 0: 全件表示, n < 0 後ろから -n件表示*/
-   137	char *date_to_string(char buf[], struct date *date)
-   138	 {
-   139	   sprintf(buf, "%04d-%02d-%02d", date->y, date->m, date->d);
-   140	   return buf;
-   141	 }
-   142	
-   143	
-   144	void print_profile(int i,struct profile *p)/*n件表示*/
-   145	{
-   146	 char date[11];
-   147	
-   148	   printf("(line%d)\n",i+1);
-   149	   printf("Id    : %d\n", p->id);
-   150	   printf("Name  : %s\n", p->name);
-   151	   printf("Birth : %s\n", date_to_string(date, &p->birth));
-   152	   printf("Addr  : %s\n", p->home);
-   153	   printf("Com.  : %s\n", p->comment);
-   154	 }
-   155	
-   156	
-   157	void cmd_print(int n)/*nで場合分け，ループ処理*/
-   158	{
-   159	  int i;
-   160	  
-   161	   if(n>0 && n<=profile_data_nitems){
-   162	    for(i=0;i<n;i++){
-   163	      print_profile(i,&profile_data_store[i]);
-   164	      printf("\n");
-   165	      }
-   166	    }else if(n==0){
-   167	
-   168	    for(i=0;i<profile_data_nitems;i++){
-   169	      print_profile(i,&profile_data_store[i]);
-   170	      printf("\n");
-   171	      }
-   172	    }else if(n<0 && (-n)<=profile_data_nitems){
-   173	    
-   174	    for(i=(profile_data_nitems+n);i<profile_data_nitems;i++){
-   175	       print_profile(i,&profile_data_store[i]);
-   176	       printf("\n");
-   177		}
-   178	    }else{
-   179	      printf("登録件数を確認してください．\n\n");
-   180	      }
-   181	}
-   182	/*コマンド文字によって，適切な関数に引数などを送るり，処理を行う．*/
-   183	void exec_command(char cmd, char *param)
-   184	{
-   185	  switch(cmd){
-   186	  case'Q':cmd_quit();  break;
-   187	  case'C':cmd_check(); break;
-   188	  case'P':cmd_print(atoi(param)); break;
-   189			   
-   190	  default:printf("error\n");
-   191	  }
-   192	}
-   193	
-   194	/*一行を読み込み，コマンド，CSV形式の解析．それぞれの値をexec_command,new_profileに送る．*/
-   195	int parse_line(char *line)
-   196	{
-   197	  int cmd;
-   198	  char *param;
-   199	  
-   200	  if(*line == '%'){
-   201	
-   202	    cmd = line[1];
-   203	    param = &line[3];
-   204	    exec_command(cmd,param);
-   205	  }else if(profile_data_nitems == MAX_PROFILES){
-   206	    printf("登録限度を越えています．\n");
-   207	  }else if(line[0] == '\0'){
-   208	    return 0;
-   209	    //printf("muri");
-   210	  } else {
-   211	    new_profile(&profile_data_store[profile_data_nitems++],line);
-   212	/*profile_data_store[profile_data_nitems]の先頭アドレスを送り，nitemsを1増やす．*/
-   213	  }
-   214	}
-   215	
-   216	/*一行を読み込み，perse_lineへ送る．*/
-   217	int main()
-   218	{
-   219	  int n=0;
-   220	  char line[MAX_LINE_LEN+1];
-   221	  while (get_line(line)){
-   222	    
-   223	    parse_line(line);
-   224	    }
-   225	  return 0;
-   226	}
 
-\end{verbatim}
-}
+
+\lstinputlisting[caption=listManager.c, label=listManager]{listManager.c}
+
 
 \end{document}
 

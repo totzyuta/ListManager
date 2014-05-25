@@ -157,32 +157,6 @@ int split(char *str, char *ret[], char sep, int max)
 	return ret;
 }
 
-/* ５つの文字列を項目毎に構造体や配列に保存 */
-int new_profile(int np, char *line)
-{
-	/* use split_test function for the test of parse_line()
-	split();
-	構造体profileの各メンバについて:
-		1番目の文字列をid	に	数値	として代入;
-		2番目の文字列をname	に	文字列	として代入;
-		3番目の文字列をbirthdayに	日付	として代入;
-		4番目の文字列をhome	に	文字列	として代入;
-		5番目の文字列をcomment	に	任意長の文字列として代入;
-	*/
-	
-	// split_test()
-	int i, cols;
-	char *ret[5];
-
-	cols = split(line, ret, ',', 5);
-
-	for (i=0; i<cols; i++) {
-		printf("	RET[%d]='%s'\n", i, ret[i]);
-	}
-	printf("\n");
-	return 1;
-}
-
 #define MAX_LINE_LEN 1024
 
 int subst(char *str, char c1, char c2)

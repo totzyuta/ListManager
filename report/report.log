@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.1415926-p3.4-110825-2.6 (utf8.euc) (TeX Live 2013) (format=platex 2014.5.26)  26 MAY 2014 07:01
+This is e-pTeX, Version 3.1415926-p3.4-110825-2.6 (utf8.euc) (TeX Live 2013) (format=platex 2014.5.26)  26 MAY 2014 09:26
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -123,17 +123,17 @@ LaTeX Font Warning: Font shape `JT1/mc/m/it' undefined
 LaTeX Font Warning: Font shape `JY1/mc/m/it' undefined
 (Font)              using `JY1/mc/m/n' instead on input line 4.
 
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 4.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 8.
 (/usr/local/texlive/2013basic/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    Font shape `OMS/cmr/m/it' in size <9> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 4.
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <9> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 8.
+LaTeX Font Info:    Font shape `OMS/cmr/m/it' in size <9> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 38.
  [6]
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <9> on input line 69.
+(Font)              <9> on input line 68.
 LaTeX Font Info:    Font shape `OML/cmr/m/it' in size <9> not available
 (Font)              Font shape `OML/cmm/m/it' tried instead on input line 118.
  [7]
@@ -141,17 +141,14 @@ LaTeX Font Info:    Font shape `OML/cmr/m/it' in size <9> not available
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
  ) 
 Here is how much of TeX's memory you used:
- 1820 strings out of 495008
- 25140 string characters out of 6176795
- 241822 words of memory out of 5000000
- 5233 multiletter control sequences out of 15000+600000
+ 1819 strings out of 495008
+ 25134 string characters out of 6176795
+ 240822 words of memory out of 5000000
+ 5232 multiletter control sequences out of 15000+600000
  15762 words of font info for 61 fonts, out of 8000000 for 9000
  107 hyphenation exceptions out of 8191
  30i,7n,49p,724b,1669s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on report.dvi (9 pages, 36100 bytes).
+Output written on report.dvi (9 pages, 36052 bytes).

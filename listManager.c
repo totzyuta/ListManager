@@ -236,9 +236,36 @@ int cmd_write(char *filename)
 	return 0;
 }
 
+/**
+ * Command %F word
+ */
 void cmd_find()
 {
+  int i;
+  
+  /* change int data to cahr data
+  char *word = "3";
+  int id = 3;
+  char s[4];
+  sprintf(s, "%d", id);   // save as char array
+  if (strcmp(s, word) == 0) {
+  
+  }
+  */
+  
+  int w = atoi(word);
 
+  for (i=0; i<profile_data_nitems; i++) {
+    p = &profile_data_store[i];
+
+    if (strcmp(p->name, word) == 0 ||
+        strcmp(p->home, word) == 0 ||
+        strcmp(p->comment, word) == 0 ||
+        id == w) {
+      print_profile(p);
+      printf("\n");
+    }
+  }
 }
 
 void cmd_sort()

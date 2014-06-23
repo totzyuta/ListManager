@@ -270,7 +270,29 @@ void cmd_find()
 
 void cmd_sort()
 {
+  void swap(int *a, int *b)
+  {
+    int tmp;
 
+    tmp = *a;
+    *a = *b;
+    *b = tmp;
+  }
+
+  /**
+   * stupid sort for testing.
+   */
+  void b_sort(int p[], int left, int right)
+  {
+    int i, j;
+    
+    for (i = left; i <= right; i++) {
+      for (j = left; j <= right - 1; j++) {
+        if (p[j] > p[j+1])
+          swap(&p[j], &p[j+1]);
+      }
+    }
+  }
 }
 
 /* judge inputed command and carry on commands/pass parameter */

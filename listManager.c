@@ -190,7 +190,8 @@ void cmd_help()
   printf("- R file: Read from file\n");
   printf("- W file: Write as file\n");
   printf("- F word: Search by word, print like P\n");
-  printf("- S n: Sort datas as the column of n");
+  printf("- S n: Sort datas as the column of n\n");
+  printf("- H: Show usage of commands\n");
 }
 
 /*コマンド文字によって，適切な関数に引数などを送るり，処理を行う．*/

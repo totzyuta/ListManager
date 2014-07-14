@@ -47,17 +47,7 @@ int split(char *str, char *ret[], char sep, int max)
 
 	while(*str && n < max){
 		if(*str == sep){
-			*str = '\0'; 
-			ret[n] = str + 1;
-		n++;
-		}
-		str++;
-	}
-	return n;
-}
-
-/*一行を読み込みsubstへ送る*/
-/* Extended for cmd_read() */
+			cmd_read() */
 int get_line(char *fp, char *line)
 {
 	if(fgets(line,1025,stdin) == NULL){

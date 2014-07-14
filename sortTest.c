@@ -15,7 +15,7 @@ void swap(int *a, int *b)
 void b_sort(int p[], int left, int right)
 {
   int i, j;
-  
+
   for (i = left; i <= right; i++) {
     for (j = left; j <= right - 1; j++) {
       if (p[j] > p[j+1])

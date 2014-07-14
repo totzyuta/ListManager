@@ -1,4 +1,8 @@
 a.out
+<<<<<<< HEAD
 .listManager.c.un~
 .middleReport.un~
 *~
+=======
+.*~
+>>>>>>> 37e8f80b84ffc2cf6db95b683fc7ae6fb0333154

@@ -34,9 +34,9 @@ int subst(char *str, char c1, char c2){
   return n;
 }
 
-int split(char *str, char *ret[], char sep, int max){
- 
- int n=0;
+int split(char *str, char *ret[], char sep, int max)
+{ 
+  int n=0;
   
   ret[n]=str;
   n = n + 1;
@@ -54,10 +54,8 @@ int split(char *str, char *ret[], char sep, int max){
 
 int get_line(FILE *fp,char *line)
 {
-  if(fgets(line,1025,fp) == NULL){
-
+  if(fgets(line,1025,fp) == NULL)
     return 0;
-  }
   
   subst(line,'\n','\0');
 
@@ -146,15 +144,15 @@ struct profile *new_profile(struct profile *p, char *csv,int edt)
    char *ptr[5];
  
    if (split(csv, ptr, ',', 5) != 5){
-     fprintf(stderr,"error: confirm the style of input or input some data\n\n");
+     fprintf(stderr,"error: invalid style of input or data\n\n");
      return NULL;
    }
 
    p->id = atoi(ptr[0]); 
    if(check_id(p) == NULL){
-     if(edt==1){
-     fprintf(stderr,"error: ID already exists.\n To edit the data, use E command\n");
-     return NULL;
+     if(edt!=1){
+       fprintf(stderr,"error: ID already exists.\n To edit the data, use E command\n");
+       return NULL;
      }
    }
 
@@ -162,14 +160,13 @@ struct profile *new_profile(struct profile *p, char *csv,int edt)
    p->name[MAX_STR_LEN] = '\0';
 
    if (new_date(&p->birth, ptr[2]) == NULL ){
-     fprintf(stderr,"Confirm the style of input");
+     fprintf(stderr,"invalid style of input");
      return NULL; 
    }
    if(check_date(&p->birth) == NULL){
      fprintf(stderr,"error: %04d-%02d-%02d is invalid date\n\n",(p->birth).y, (p->birth).m, (p->birth).d);
      return NULL;
    }
-   
   
    strncpy(p->home, ptr[3], MAX_STR_LEN); 
    p->home[MAX_STR_LEN] = '\0';
@@ -180,9 +177,7 @@ struct profile *new_profile(struct profile *p, char *csv,int edt)
    profile_data_nitems++;
    
    return p;
-   
 }
-
 
 void cmd_quit()
 {
@@ -192,13 +187,7 @@ void cmd_quit()
 
 void cmd_check()
 {
-  printf("Number of elements: %d\n",profile_data_nitems);
-}
-
-char *date_to_string(char buf[],struct date *date)
-{
-  sprintf(buf,"%04d-%02d-%02d",date->y,date->m,date->d);
-  return buf;
+  printf("Number of elements: %d\n\n",profile_data_nitems);
 }
 
 void print_profile(int i,struct profile *p)
@@ -212,6 +201,7 @@ void print_profile(int i,struct profile *p)
   printf("comment:%s\n",p->comment);
 }
 
+// %P: print
 int min(int a, int b)
 {
   if(a < b) return a;
@@ -235,9 +225,9 @@ void cmd_print(int nitems)
     start = max(end - (-nitems),0);
   }
 
-  for(i = start; i < end ; i++){
+  for(i = start; i < end; i++){
     print_profile(i,&profile_data_store[i]);
-    printf("\n");
+    printf("\n\n");
   }
 }
 
@@ -249,7 +239,7 @@ int cmd_read(char *filename)
   fp = fopen(filename,"r");
 
   if(fp == NULL){
-    fprintf(stderr,"error: could not open the file\n\n");
+    fprintf(stderr,"error: could not read the file\n\n");
     return -1;
   }
 
@@ -260,6 +250,7 @@ int cmd_read(char *filename)
   return 0;
 }
 
+// %W: write
 void fprint_profile_csv(FILE *fp,struct profile *p)
 {
   fprintf(fp,"%d,%s,%04d-%02d-%02d,%s,%s\n",p->id, p->name, (p->birth).y, p->birth.m, (p->birth).d, (p->home), p->comment);
@@ -285,6 +276,12 @@ int cmd_write(char *filename)
   return 0;
 }
 
+// %F: find
+char *date_to_string(char buf[],struct date *date)
+{
+  sprintf(buf,"%04d-%02d-%02d",date->y,date->m,date->d);
+  return buf;
+}
 
 void cmd_find(char *word)
 {
@@ -295,21 +292,19 @@ void cmd_find(char *word)
   int n=0;
   
   for(i = 0; i < profile_data_nitems; i++){
-      p = &profile_data_store[i];
-      sprintf(s,"%d",p->id);
-      date_to_string(birthday_str,&p->birth);
-      
-	if(strcmp(s,word) == 0 ||
-	   strcmp(p->name,word) == 0 ||
-	   strcmp(birthday_str,word) == 0 ||
-	   strcmp(p->home,word) == 0 ||
-	   strcmp(p->comment,word) == 0){
-	  
-	  print_profile(i,p);
-	  printf("\n");
-	}else{
-	  n++;
-	}
+    p = &profile_data_store[i];
+    sprintf(s,"%d",p->id);
+    date_to_string(birthday_str,&p->birth);
+    if(strcmp(s,word) == 0 ||
+       strcmp(p->name,word) == 0 ||
+       strcmp(birthday_str,word) == 0 ||
+       strcmp(p->home,word) == 0 ||
+       strcmp(p->comment,word) == 0){
+        print_profile(i,p);
+        printf("\n");
+    }else{
+      n++;
+    }
   }
   if(n = profile_data_nitems){
     fprintf(stderr,"error: could not find\n\n");
@@ -339,6 +334,7 @@ int profile_compare(struct profile *p1,struct profile *p2,int param)
    
   switch(param){
   case 1:
+    printf("Sorted by id");
     return p1->id - p2->id;
   case 2:
     return strcmp(p1->name,p2->name);
@@ -358,13 +354,13 @@ void cmd_sort(int param)
 
   if(param>5 || 0>=param) fprintf(stderr,"error: input a number of 1 to 5\n");
 
-  for(i=left;i<=right;i++){
-      for(j=left;j<=right-1;j++){
-	      cmp = profile_compare(&profile_data_store[j],&profile_data_store[j+1],param);
-	      if(cmp > 0){
-	        swap_profile(&profile_data_store[j],&profile_data_store[j+1]);
-	      }
+  for(i=left; i<=right; i++){
+    for(j=left; j<=right-1; j++){
+      cmp = profile_compare(&profile_data_store[j],&profile_data_store[j+1],param);
+      if(cmp > 0){
+        swap_profile(&profile_data_store[j],&profile_data_store[j+1]);
       }
+    }
   }
 }
 
@@ -376,7 +372,7 @@ void cmd_edit()
   char *ptr[5],*aft;
   struct profile *p;
 
-  printf("input id\n id:");
+  printf("What is ID of the data you want to edit?\n id:");
   fgets(m,MAX_LINE_LEN + 1,stdin);
   id = atoi(m);
 
@@ -395,20 +391,13 @@ void cmd_edit()
   }
 }
 
-void cmd_size(struct profile p)
-{
-  printf("id=%d, name=%d, birth=%d, addr=%d, comment=%d\n",
-           sizeof(p.id), sizeof(p.name), sizeof(p.birth), sizeof(p.home), sizeof(p.comment));
-    printf("struct profile=%d\n", sizeof(p));
-}
-
 // %H help
 void cmd_help()
 {
   printf("\n# HELP\n");
   printf("## Commands\n");
   printf("- Q: Quit\n");
-  printf("- C: check\n");
+  printf("- C: check the number of registered datas\n");
   printf("- P n: Print n elements (n=0:all, n<0:from behind)\n");
   printf("- R file: Read from file\n");
   printf("- W file: Write as file\n");
@@ -428,12 +417,10 @@ void exec_command(char cmd, char *param)
   case'F':cmd_find(param);  break;
   case'S':cmd_sort(atoi(param));  break;
   case'E':cmd_edit(); break;
-  case'O':cmd_size(profile_data_store[atoi(param)]); break;
   case'H':cmd_help(); break;
   default:fprintf(stderr,"error\n\n");
   }
 }
-
 
 int parse_line(char *line)
 {
@@ -441,17 +428,15 @@ int parse_line(char *line)
   char *param;
   
   if(*line == '%'){
-
     cmd = line[1];
     param = &line[3];
     exec_command(cmd,param);
- 
-  } else if(*line == '\0'){
-    fprintf(stderr,"error: input a data\n\n");
+  }else if(*line == '\0'){
+    fprintf(stderr,"error: no input\n\n");
     return 0;
-  } else if(profile_data_nitems == MAX_PROFILES){
+  }else if(profile_data_nitems == MAX_PROFILES){
     fprintf(stderr,"error: over the limit of datas\n\n");
-  } else {
+  }else {
     new_profile(&profile_data_store[profile_data_nitems],line,std);
   }
   return 0;
@@ -461,9 +446,8 @@ int parse_line(char *line)
 int main()
 {
   printf("Program has sterted.Type a command after a symbol of parcent. To show help, type H command.\n");
-  int n=0;
   char line[MAX_LINE_LEN+1];
-  while (get_line(stdin,line)){
+  while(get_line(stdin,line)){
     parse_line(line);
   }
   return 0;

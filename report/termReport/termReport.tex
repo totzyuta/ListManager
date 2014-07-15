@@ -1,0 +1,450 @@
+\documentclass[a4j]{jarticle}
+
+\usepackage{listings}
+
+\lstset{%
+  language={C},
+  basicstyle={\small},%
+  identifierstyle={\small},%
+  commentstyle={\small\itshape},%
+  keywordstyle={\small\bfseries},%
+  ndkeywordstyle={\small},%
+  stringstyle={\small\ttfamily},
+  frame={tb},
+  breaklines=true,
+  columns=[l]{fullflexible},%
+  numbers=left,%
+  xrightmargin=0zw,%
+  xleftmargin=3zw,%
+  numberstyle={\scriptsize},%
+  stepnumber=1,
+  numbersep=1zw,%
+  lineskip=-0.5ex%
+}
+
+\title{プログラミング演習\\期末レポート}
+\author{\\学籍番号：09425566\\氏名：戸塚佑太}
+\date{出題日：2014/07/14\\提出日：2014/07/14\\締切り日：2014/07/14\\}
+
+\begin{document}
+\maketitle
+
+\newpage
+
+
+
+%
+%	SECTION 1
+%
+
+\section{概要}
+
+このレポートでは，標準入力からカンマ区切りのCSV形式のファイル，またはCSVデータを入力し，それら1行ずつ読み込み，区切りごとにid,name,birth,addr,commentの5つの項目に分けて格納し，表示するプログラムを作成する過程を示すものである．
+
+\begin{enumerate}
+\item 格納するデータを構造体として表現．指定されたデータ構造は以下の通りである．
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}\hline
+\centering
+ID&学校名&設立年月日&所在地&備考データ\\\hline
+32bit整数&70bytes&struct date&70bytes&任意長\\\hline
+\end{tabular}
+\end{center}
+
+この構造体を配列として10000件のデータを格納できるように宣言する．
+
+\item 標準入力からの入力をCSV形式として読み込み，上記に指定された構造体の配列に格納する．SCVは次の形式とする．
+
+{\baselineskip 3mm
+\begin{verbatim}
+ 0,Takahashi Kazuyuki,1977-04-27,Saitama,Fukuoka Softbank Howks
+ 1,Yuta Totsuka,1993-04-24,Okayama,Kurashiki
+ 2,Kubo Shota,1993-04-16,Ehime,Matuyamakita
+ 3,Oigawa Satoshi,1993-04-18,Shimane,Matueminami
+ .
+ .
+\end{verbatim}
+}
+
+\item ％から始まる文はCSV入力ではなくコマンドとみなして処理を行う.％Q,％C,％P,％R,％W,％F,％S,％E,％Hコマンドを実装し，それぞれのコマンドが入力されたとき、次の動作を行うこととする．
+
+\begin{center}
+\begin{tabular}{|c|c|c|}\hline
+コマンド&意味&備考\\ \hline
+％Q&終了(Quit)&\\ \hline
+％C&登録件数の表示(Check)&\\ \hline
+％P n&先頭からn件表示&n=0:全件表示,n$<$0:後ろから-n件表示\\ \hline
+％R file&fileからデータを読み込む&\\ \hline
+％W file&fileへデータを書き出す&\\ \hline
+％F word&検索結果の表示&％Pと同形式で表示\\ \hline
+％S n&CSVのn番目の項目でソート&表示はしない\\ \hline
+％E&指定したidのデータを編集&\\ \hline
+％H&ヘルプ画面の表示&\\ \hline
+\end{tabular}
+\end{center}
+
+\end{enumerate}
+
+
+%
+%	SECTION 2
+%
+
+\section{プログラムの作成方針}
+
+今回のプログラムは大きなプログラムとなるので，いくつかの処理に分けて関数を作成する．
+処理の概要は以下の通りに定め，下記でそれぞれについて解説する．
+\begin{itemize}
+\item[(1)]格納を行う構造体の宣言部
+\item[(2)]標準入力からの文章を1行読み込む
+\item[(3)]標準入力データがCSVの場合の処理
+\item[(4)]標準入力データがコマンドの場合の処理
+\end{itemize}
+
+まず，(1)格納を行う構造体の宣言部　については，概要で示した通りにデータを格納できるよう宣言する．
+
+{\baselineskip 3mm
+\begin{verbatim}
+struct date{
+  int y;
+  int m;
+  int d;
+};
+
+struct profile{
+  int id;
+  char name[MAX_STR_LEN+1];
+  struct date birth;
+  char home[MAX_STR_LEN+1];
+  char *comment;
+};
+
+struct profile profile_data_store[MAX_PROFILES];
+\end{verbatim}
+}
+
+
+{\baselineskip 3mm
+\begin{verbatim}
+
+(2)標準入力からの文章を1行読み込む　は主にget_line,subst,perse_lineの部分で処理を行っている．標準入力されたデータをchar *lineで1行分読み込み，1文字目が%であれば2文字目以降のコマンドと引数を別関数の引数とし，各コマンドに応じた処理を行う．また，１文字目が％でない場合はこの1行をCSV形式の文とみなし，カンマ ',' を区切りとして5つの文字列として分割する．
+
+(3)標準入力データがCSVの場合の処理　はnew_profile,new_date,splitの部分で処理を行っている．標準入力されたデータがCSVデータだった場合，1行毎に文字列として分割し，これらをnew_profileに送り，項目毎に適切な方に変換し，それぞれ構造体のメンバに代入する．文字列の場合はそのまま代入を行うためにstrncpy,数値の場合はatoiを使い変数変換を行い代入・格納する．設立年月日の部分(2013-6-6)の文字列もnew_dateに送り，'-'を区切りとして同様に文字列として分割し，数値変換を行ってから変数に格納する．
+また，分割して送られてきた文字列はstrncpyを使用し，メモリ間のコピーを行わなければならないことに注意しなければならない．
+
+(4)標準入力データがコマンドの場合の処理　は各コマンドの実現部分であり，プログラムの終了，登録件数・登録項目の表示を行う部分である．プログラムの終了はexit(0)を使用することにより，コマンド入力後に処理が停止する．登録件数はprintfで表示する．登録項目の表示は3文字目以降の引数の件数分(n件)をそれぞれ場合分けしてprintfで表示させる．場合分けの方法は，概要の示している通りに行っている．また登録件数を越えた引数(|nitems|>n)が送られた場合はerrorが表示されるようになっている．
+
+\end{verbatim}
+}
+
+%
+%	SECTION 3
+%
+
+\section{プログラムリストおよび、その説明}
+
+\begin{verbatim}
+　完成したプログラムを末尾に添付する．このセクションでは，プログラムの主な構造について説明する．
+まず，8-20行ではstruct dataのデータ型の宣言部とそれを扱う関数の宣言部である．次に，subst,splitを26-53行付近で宣言している．substはstrの文字列中のc1をc2へと変換する．ここでは','を'\0'へと変換している．splitでは送られてきたstrの文字列中の区切りsepで分割し，substと同様に','へと'\0'変換し，分割したものをret[]に格納している．これらの文字列を示す複数からなる配列を返す．また"2013-06-06"のような日付を分けるために分割文字を'-'としてstruct_dateで同様の処理を行っている．
+次に55-63,425-443,446~454行のget_line,perse_line,mainでは標準入力され文章を1行ごと読み込み，解析し，データが%から始まっていればコマンド文字と引数をexec_commandに送る．そうでなければ一行をnew_profileに送る．
+また142-180,102-115行のnew_profile,new_dateでは解析を行い，送られてきた一行を分割し，格納を行う．ここで，"2013/06/07"のように'-'で区切られず，間違った形式で入力された場合は処理されず，はじかれる．上記のsplitで分割した無事列配列を構造体の宣言部のデータ型に変換し，代入を行っている．文字列はstrncpy,数値はatoi関数を使用．これらをprofile_data_storeに格納している．profile_data_storeに格納できる件数は最大10000件となっている
+
+\end{verbatim}
+
+%
+%	SECTION 4
+%
+
+\section{プログラムの使用例・テスト}
+
+本プログラムは名簿データを管理するためのプログラムである．標準入力されたCSV形式のデータまたはファイル，％から始まるコマンドに応じた処理をし，処理結果を標準出力に表示する．入力形式については概要を参照．
+まず、本プログラム(main.c)をgccによりコンパイルし，a.outという実行ファイルを作成する。test.csvというCSVファイルの読み込み（入力）を行う場合は、下のように./a.out < test.csvと入力する。
+
+{\baselineskip 3mm
+\begin{verbatim}
+% gcc main.c
+% ./a.out < test.csv
+\end{verbatim}
+}
+
+test.csvは以下のようであった場合を想定する。
+
+{\baselineskip 3mm
+\begin{verbatim}
+
+1,Takahashi Kazuyuki,1977-04-27,Saitama,Fukuoka Softbank Howks
+2,Yuta Totsuka,1993-04-24,Okayama,Kurashiki
+3,Kubo Shota,1993-04-16,Ehime,Matuyamakita
+4,Oigawa Satoshi,1993-04-18,Shimane,Matueminami
+%P 0
+%P 2
+%P -2
+%P 5
+%C
+\end{verbatim}
+}
+
+このとき以下のように、ユーザがより読み取りやすいように出力を得ることができる．
+
+{\baselineskip 3mm
+\begin{verbatim}
+
+(line1)Id    : 1
+Name  : Takahashi Kazuyuki
+Birth : 1977-04-27
+Addr  : Saitama
+Com.  : Fukuoka Softbank Howks
+
+(line2)Id    : 2
+Name  : Yuta Totsuka
+Birth : 1993-04-24
+Addr  : Okayama
+Com.  : Kurashiki
+
+(line3)Id    : 3
+Name  : Kubo Shota
+Birth : 1993-04-16
+Addr  : Ehime
+Com.  : Matuyamakita
+
+(line4)Id    : 4
+Name  : Oigawa Satoshi
+Birth : 1993-04-18
+Addr  : Shimane
+Com.  : Matueminami
+
+(line1)Id    : 1
+Name  : Takahashi Kazuyuki
+Birth : 1977-04-27
+Addr  : Saitama
+Com.  : Fukuoka Softbank Howks
+
+(line2)Id    : 2
+Name  : Yuta Totsuka
+Birth : 1993-04-24
+Addr  : Okayama
+Com.  : Kurashiki
+
+(line3)Id    : 3
+Name  : Kubo Shota
+Birth : 1993-04-16
+Addr  : Ehime
+Com.  : Matuyamakita
+
+(line4)Id    : 4
+Name  : Oigawa Satoshi
+Birth : 1993-04-18
+Addr  : Shimane
+Com.  : Matueminami
+
+登録件数を確認してください．
+
+登録件数：4件
+
+\end{verbatim}
+}
+
+入力中の”％P 2”, "％P 0", "％P -2"はそれぞれ"前から2件表示"，"全件表示"，"後ろから2件表示"する処理を呼び出すコマンドである．
+％Cは登録件数の表示をする処理を呼び出すコマンドである．
+
+次に、以下の新しいデータを入力し、以下のコマンドを入力したとする。
+
+{\baselineskip 3mm
+\begin{verbatim}
+
+5,Mori Masataka,1993-03-24,Okayama,Amaki
+%W test.csv
+
+\end{verbatim}
+}
+
+％Wは指定ファイルに書き込みを行うコマンドである。書き込みを行われたtest.csvファイルは以下のようになる。
+
+{\baselineskip 3mm
+\begin{verbatim}
+hashi Kazuyuki,1977-04-27,Saitama,Fukuoka Softbank Howks
+3,Yamamoto Yasutaka,1993-07-12,Okayama,Kurasikiminami
+1,Kubo Shota,1993-04-16,Ehime,Matuyamakita
+4,Oigawa Satoshi,1993-04-18,Shimane,Matueminami
+5,Mori Masataka,1993-03-24,Okayama,Amaki
+\end{verbatim}
+}
+
+次に検索を行ってみる。
+
+{\baselineskip 3mm
+\begin{verbatim}
+
+%F Saitama
+%F 1993-07-12
+%F 4
+
+\end{verbatim}
+}
+
+％Fの後ろに入力されたwordと一致するものを％Pと同様の形式で出力する。出力結果は以下のようになる。
+
+{\baselineskip 3mm
+\begin{verbatim}
+
+
+%F Saitama
+(line1)
+id:2
+name:Takahashi Kazuyuki
+Birth:1977-04-27
+addr:Saitama
+comment:Fukuoka Softbank Howks
+
+%F 1993-07-12
+(line2)
+id:3
+name:Yamamoto Yasutaka
+Birth:1993-07-12
+addr:Okayama
+comment:Kurasikiminami
+
+%F 4 (line4)
+id:4
+name:Oigawa Satoshi
+Birth:1993-04-18
+addr:Shimane
+comment:Matueminami
+
+
+\end{verbatim}
+}
+
+％Sはソートコマンドである。％Sの後にそれぞれ対応するカラムの番号を入力することで、並び替えが行われる。（1:id, 2:name, 3:birth, 4:addr, 5:comment）以下に、1でソートした例を示す。
+
+
+{\baselineskip 3mm
+\begin{verbatim}
+
+
+
+\hashi Kazuyuki,1977-04-27,Saitama,Fukuoka Softbank Howks
+3,Yamamoto Yasutaka,1993-07-12,Okayama,kojima
+1,Kubo Shota,1993-04-16,Ehime,Matuyamakita
+4,Oigawa Satoshi,1993-04-18,Shimane,Matueminami
+5,Mori Masataka,1993-03-24,Okayama,Amaki
+ソート後)
+1,Kubo Shota,1993-04-16,Ehime,Matuyamakita
+2,Takahashi Kazuyuki,1977-04-27,Saitama,Fukuoka Softbank Howks
+3,Yamamoto Yasutaka,1993-07-12,Okayama,kojima
+4,Oigawa Satoshi,1993-04-18,Shimane,Matueminami
+5,Mori Masataka,1993-03-24,Okayama,Amaki
+
+\end{verbatim}
+}
+
+また、％Sでは実際にソートされた結果は表示されない。ソートしたものを％Wを使い、csvファイルに書き込んだものを上記には示している。
+％Eは以下のような実行が行われる
+
+{\baselineskip 3mm
+\begin{verbatim}
+
+%E
+id を入力してください.
+ id:1
+ Before
+ 1,Kubo Shota,1993-04-16,Ehime,Matuyamakita
+ After
+
+\end{verbatim}
+}
+
+上記はid:1のデータの編集を行う場合である。Afterの後に
+
+{\baselineskip 3mm
+\begin{verbatim}
+
+1,Ishii Isamu, 1993-08-09,Okayama,Konan
+
+\end{verbatim}
+}
+
+と入力した場合、以下のように編集される。また、以前行ったソート後の状態であるとする。
+
+{\baselineskip 3mm
+\begin{verbatim}
+
+shii Isamu,1993-08-09,Okayama,Konan
+2,Takahashi Kazuyuki,1977-04-27,Saitama,Fukuoka Softbank Howks
+3,Yamamoto Yasutaka,1993-07-12,Okayama,kojima
+4,Oigawa Satoshi,1993-04-18,Shimane,Matueminami
+5,Mori Masataka,1993-03-24,Okayama,Amaki
+
+\end{verbatim}
+}
+
+また、％Hはヘルプ画面である。実行結果は以下の通りで、本プログラムにおけるコマンド一覧を確認することが出来るようになっている。
+
+{\baselineskip 3mm
+\begin{verbatim}
+
+%H
+
+# HELP
+## Commands
+- Q: Quit
+- C: check the number of registered datas
+- P n: Print n elements (n=0:all, n<0:from behind)
+- R file: Read from file
+- W file: Write as file
+- F word: Search by word, print like P
+- S n: Sort datas as the column of n
+- H: Show usage of commands
+
+\end{verbatim}
+}
+
+以上がコマンドの使用例である。
+
+
+%
+%	SECTION 5
+%
+
+\section{プログラム作成における考察}
+
+\begin{verbatim}
+プログラムの作成過程での考察は，分割して返された文字列を代入する際に，strncpyを使うようにした．数値の代入をするためにはatoi関数を使い値を直接代入するようにした．またcmd_print関数内では初め，すべてのnの場合分けを行いループを考え，その中のすべてで表示させていたが，記述量も多くなり，効率的では無いと考えたために，printで表示させる部分だけを別関数で作成し，ループ内に返されるように変更した．
+cmd_find 関数では入力された引 数が文字列であるため,strcmp で比較を行うようにした.これはそれぞれの型の変換を行うこと なく比較ができるためにこの様な比較方法を採用した.ソートにおいても別関数で合分けを行い, どのような大小関係(数字,アルファベット順)においても正,0,負のなどの統一の値が返せる ようにした.そうすることにより,並び代えの処理も同じになり,記述量を減らせるようにした. またバブルソートを採用しているのは,なるべく簡単な記述を採用し,分かりやすいプログラムを 作成しようと考えたためである.
+
+\end{verbatim}
+
+%
+%	SECTION 6
+%
+
+\section{得られた結果に関する，あるいは諮問に対する回答}
+
+\begin{verbatim}
+
+struct profile *newprofileのように構造体の宣言にポインタがついているものがある．これはポインタを付けることによって，格納し，蓄積させたデータのすべてを返すのではなく先頭アドレスだけを返している．構造体内のすべての数値，文字列を返すよりも，効率が上がると考えたためである．また今回のプログラムではn件の登録件数に対し，その件数を上回る件数の表示を行おうとすると，登録件数を確認するように促し，表示がされないようにしている．この場合に表示を行った場合に，多少分かりにくくなってしまうのでは無いかと考え，まず登録件数を確認するように促すようにした．また最大の登録件数を越えて，新たなデータを登録しようとしたさいに，perse_line内で条件文により，最大登録件数になってしまっていることを伝え，そこで処理を終えるようになっている．
+
+コマンド％E
+新たなコマンドとして%E, 編集を作成した.プログラムの使用例でも記述したように,編集したい id のデータを再び入力し,上書きするコマンドである.入力した id を atoi 関数で数値変換し, 既に登録されている id を数値として比較し,同じ id が見つかれば既に登録されているデータを CSV 形式で表示させる.表示例はプログラム使用例に示したとおりである. その後,変更したいデータの入力を行う.この時に’\0’ のみや間違った形式で入力すると弾かれ るようになっている.新たに入力したデータの分割には new_profile を使用しているが,分割が 正常に終了すれば profile_data_nitem++を行うようになっている.そのため編集の際は成功し た後に,profile_data_nitems--を行うようにし,データの総数は増えないようにしている.
+
+コマンド％H
+また、新たなコマンドとして％Hも追加した。コマンドの確認を仕様書を見直して確認する必要がないよう、全てのコマンドを、プログラム内で参照できるように実装した。
+
+\end{verbatim}
+
+\newpage
+
+%
+%	SECTION 6
+%
+
+\section{作成したプログラムのソースコード}
+
+
+
+\lstinputlisting[caption=main.c, label=main.c]{../../main.c}
+
+
+\end{document}
+

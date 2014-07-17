@@ -420,6 +420,7 @@ void exec_command(char cmd, char *param)
   case'H':cmd_help(); break;
   default:fprintf(stderr,"error\n\n");
   }
+  printf(":");
 }
 
 int parse_line(char *line)
@@ -432,10 +433,10 @@ int parse_line(char *line)
     param = &line[3];
     exec_command(cmd,param);
   }else if(*line == '\0'){
-    fprintf(stderr,"error: no input\n\n");
+    fprintf(stderr,"error: no input\n\n:");
     return 0;
   }else if(profile_data_nitems == MAX_PROFILES){
-    fprintf(stderr,"error: over the limit of datas\n\n");
+    fprintf(stderr,"error: over the limit of datas\n\n:");
   }else {
     new_profile(&profile_data_store[profile_data_nitems],line,std);
   }
@@ -445,7 +446,7 @@ int parse_line(char *line)
 
 int main()
 {
-  printf("Program has sterted.Type a command after a symbol of parcent. To show help, type H command.\n");
+  printf("Program has sterted.Type a command after a symbol of parcent. To show help, type H command.\n:");
   char line[MAX_LINE_LEN+1];
   while(get_line(stdin,line)){
     parse_line(line);

@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.1415926-p3.4-110825-2.6 (utf8.euc) (TeX Live 2013) (format=platex 2014.5.26)  16 JUL 2014 08:33
+This is e-pTeX, Version 3.1415926-p3.4-110825-2.6 (utf8.euc) (TeX Live 2013) (format=platex 2014.5.26)  17 JUL 2014 11:41
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -102,19 +102,30 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <7> on input line 48.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <5> on input line 48.
- [2] [3] [4] [5] [6] [7] [8] (../../main.c
-LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <9> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 1.
-LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <9> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 1.
-LaTeX Font Info:    Try loading font information for OML+cmr on input line 1.
+ [2] [3] [4] [5] [6serted.
+<inserted text> 
+                $
+l.128 ...準入力からの文章を1行読み込む，は主にget_
+                                                  line,subst,perse_lineの部...
+? 
+! Emergency stop.
+<inserted text> 
+                $
+l.128 ...準入力からの文章を1行読み込む，は主にget_
+                                                  line,subst,perse_lineの部...
+End of file on the terminal!
 
-(/usr/local/texlive/2013basic/texmf-dist/tex/latex/base/omlcmr.fd
-File: omlcmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
-)
-LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <9> not available
-(Font)              Font shape `OML/cmm/m/it' tried instead on input line 1.
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 8.
+ 
+Here is how much of TeX's memory you used:
+ 1558 strings out of 495008
+ 22117 string characters out of 6176795
+ 112822 words of memory out of 5000000
+ 4992 multiletter control sequences out of 15000+600000
+ 13269 words of font info for 52 fonts, out of 8000000 for 9000
+ 107 hyphenation exceptions out of 8191
+ 26i,7n,49p,362b,321s stack positions out of 5000i,500n,10000p,200000b,80000s
+Output written on termReport.dvi (2 pages, 5096 bytes).
+o:    Try loading font information for OMS+cmr on input line 8.
 
 (/usr/local/texlive/2013basic/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
@@ -152,4 +163,4 @@ Here is how much of TeX's memory you used:
  107 hyphenation exceptions out of 8191
  30i,7n,49p,728b,1697s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on termReport.dvi (15 pages, 66660 bytes).
+Output written on termReport.dvi (15 pages, 67876 bytes).
